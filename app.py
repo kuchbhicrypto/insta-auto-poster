@@ -102,28 +102,36 @@ def upload():
         return redirect('/login')
 
     if request.method == 'POST':
-        file = request.files['file']
-        filetype = request.form['filetype']
-        schedule_time = request.form['schedule_time']
-        username = session['user']
+        try:
+            file = request.files['file']
+            filetype = request.form['filetype']
+            schedule_time = request.form['schedule_time']
+            username = session['user']
 
-        if file and allowed_file(file.filename):
-            filename = f"{username}_{datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}"
-            filepath = os.path.join(UPLOAD_FOLDER, filename)
-            file.save(filepath)
+            if file and allowed_file(file.filename):
+                filename = f"{username}_{datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}"
+                filepath = os.path.join(UPLOAD_FOLDER, filename)
+                file.save(filepath)
 
-            conn = sqlite3.connect('users.db')
-            c = conn.cursor()
-            c.execute("INSERT INTO uploads (username, filename, filetype, schedule_time) VALUES (?, ?, ?, ?)",
-                      (username, filename, filetype, schedule_time))
-            conn.commit()
-            conn.close()
+                print("Saving to DB:", username, filename, filetype, schedule_time)
 
-            return "File uploaded and scheduled successfully!"
-        else:
-            return "Invalid file type!"
+                conn = sqlite3.connect('users.db')
+                c = conn.cursor()
+                c.execute("INSERT INTO uploads (username, filename, filetype, schedule_time) VALUES (?, ?, ?, ?)",
+                          (username, filename, filetype, schedule_time))
+                conn.commit()
+                conn.close()
+
+                print("Data saved successfully ✅")
+                return "File uploaded and scheduled successfully!"
+            else:
+                return "Invalid file type!"
+        except Exception as e:
+            print("Error while uploading:", e)
+            return f"Error: {e}"
 
     return render_template('upload.html')
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000, debug=True)
