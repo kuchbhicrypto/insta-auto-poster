@@ -1,6 +1,6 @@
 import requests
 
-def generate_caption(image_description):
+def generate_caption(desc="luxury travel"):
     api_key = "YOUR_GEMINI_API_KEY"
     headers = {
         "Content-Type": "application/json",
@@ -9,7 +9,7 @@ def generate_caption(image_description):
 
     data = {
         "contents": [{
-            "parts": [{"text": f"Write a viral Instagram caption with emojis and 10 trending hashtags for a photo of: {image_description}"}]
+            "parts": [{"text": f"Write a viral Instagram caption for: {desc}. Add emojis and 10 trending hashtags."}]
         }]
     }
 
