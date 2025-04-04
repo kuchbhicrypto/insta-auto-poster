@@ -1,39 +1,22 @@
-from flask import Flask, request, redirect
-import requests
-import json
+import os
+from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
 
-CLIENT_ID = 'YOUR_INSTAGRAM_CLIENT_ID'
-CLIENT_SECRET = 'YOUR_INSTAGRAM_CLIENT_SECRET'
-REDIRECT_URI = 'https://YOUR_RENDER_URL/insta/callback'
-
 @app.route('/')
-def login():
-    return f'''
-    <h1>Auto Poster App</h1>
-    <a href="https://api.instagram.com/oauth/authorize?client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}&scope=user_profile,user_media&response_type=code">Login with Instagram</a>
-    '''
+def index():
+    return render_template('index.html')
 
-@app.route('/insta/callback')
-def callback():
-    code = request.args.get('code')
-
-    payload = {
-        'client_id': CLIENT_ID,
-        'client_secret': CLIENT_SECRET,
-        'grant_type': 'authorization_code',
-        'redirect_uri': REDIRECT_URI,
-        'code': code
-    }
-
-    res = requests.post("https://api.instagram.com/oauth/access_token", data=payload)
-    data = res.json()
-
-    with open("tokens.json", "w") as f:
-        json.dump(data, f, indent=4)
-
-    return "✅ Instagram connected! Token saved."
+@app.route('/upload', methods=['POST'])
+def upload():
+    image_url = request.form['image_url']
+    caption = request.form['caption']
+    
+    # ⚠️ Add your Instagram upload logic here (via Graph API)
+    print(f"Posting to Instagram...\nImage: {image_url}\nCaption: {caption}")
+    
+    return f"✅ Image scheduled for Instagram!\nImage: {image_url}\nCaption: {caption}"
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))  # Render binds to this PORT
+    app.run(host='0.0.0.0', port=port, debug=True)
