@@ -7,9 +7,12 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
 
+# === Define Full DB Path ===
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'users.db')
+
 # === Setup DB if not exists ===
 def init_db():
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS users (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -33,7 +36,7 @@ def signup():
         username = request.form['username']
         password = generate_password_hash(request.form['password'])
         try:
-            conn = sqlite3.connect('users.db')
+            conn = sqlite3.connect(DB_PATH)
             c = conn.cursor()
             c.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
             conn.commit()
@@ -48,7 +51,7 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        conn = sqlite3.connect('users.db')
+        conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
         c.execute("SELECT * FROM users WHERE username=?", (username,))
         user = c.fetchone()
@@ -82,7 +85,7 @@ def allowed_file(filename):
 
 # Add new route to database for scheduled uploads
 def init_post_db():
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS uploads (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -115,7 +118,7 @@ def upload():
 
                 print("Saving to DB:", username, filename, filetype, schedule_time)
 
-                conn = sqlite3.connect('users.db')
+                conn = sqlite3.connect(DB_PATH)
                 c = conn.cursor()
                 c.execute("INSERT INTO uploads (username, filename, filetype, schedule_time) VALUES (?, ?, ?, ?)",
                           (username, filename, filetype, schedule_time))
