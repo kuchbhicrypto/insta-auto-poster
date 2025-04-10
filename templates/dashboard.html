@@ -1,10 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head><title>Dashboard</title></head>
+<style>
+  body { font-family: Arial; padding: 20px; background: #f5f5f5; }
+  h2 { color: #333; }
+  a { color: #007BFF; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+</style>
 <body>
   <h2>Welcome, {{ username }}!</h2>
   <p>This is your dashboard.</p>
   <p><a href="/upload">Upload Image or Reel</a></p>
   <a href="/logout">Logout</a>
+  <h3>Your Scheduled Uploads</h3>
+  <ul>
+    {% for u in uploads %}
+      <li><b>{{ u[2] }}</b> ({{ u[3] }}) scheduled for {{ u[4] }}</li>
+    {% endfor %}
+  </ul>
+
 </body>
 </html>
